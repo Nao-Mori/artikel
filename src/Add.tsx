@@ -7,6 +7,7 @@ const Add = () =>{
     const [word, setWord] = useState("")
     const [name, setName] = useState("")
     const [added, setAdded] = useState(false)
+    const [adding, setAdding] = useState(false)
 
     return(
         <div 
@@ -22,7 +23,7 @@ const Add = () =>{
           {added?
           <div>
               <h2>Thank you for sharing!</h2>
-              <button>Add more words</button>
+              <button onClick={()=>setAdded(false)}>Add more words</button>
               </div>
           :<div>
               <h2>Add New Words!</h2>
@@ -56,22 +57,32 @@ const Add = () =>{
              value={name}
           />
           <br/>
+          {adding?
+          <h3>Adding...</h3>
+          :
           <button
             onClick={()=>{
                 if( name && word.length > 2 && article ){
                     let today = new Date()
                     let time = today.getMonth() + "/" + today.getDate() + "/" + today.getFullYear()
+                    setAdding(true)
                     axios.post('https://api.motimanager.com',
                     { name: name, word: word, article: article, time: time})
                     .then(()=>{
                         setWord("")
                         setArticle("")
+                        setAdded(true)
+                        setAdding(false)
+                    })
+                    .catch(()=>{
+                        setAdding(false)
                     })
                 }
             }}
           >
             ADD
           </button>
+        }
           </div>
             }
         </div>

@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Flag, CheckBox, CropSquare } from "@material-ui/icons"
 
 const arts = ["das", "der", "die"]
-const reasons = ["Incorrect article", "None-exsistent / misspelled word", "Inappropriate word"]
+const reasons = ["Incorrect article", "None-existent / misspelled word", "Inappropriate word"]
 
 interface State {
     quiz: {
@@ -53,10 +53,10 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
                     key={key}
                     style={
                     answer === art && answer === quiz.article ?
-                    {backgroundColor:"orange"}
+                    {backgroundColor:"green"}
                     :
                     answer === art?
-                    {backgroundColor:"black"}
+                    {backgroundColor:"rgb(200,0,0)"}
                     :
                     {}
                     }
@@ -79,7 +79,7 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             <p/>
             <h4>
                 Added by {quiz.name}
-                <Flag fontSize="large" style={{cursor:"pointer",color:"red"}} onClick={()=>{
+                <Flag fontSize="large" style={{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
                     setReport(true)
                     setReportCard(quiz)
                 }}/>
@@ -93,12 +93,23 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             <h1 style={{margin: 0}}>{reportCard.article} {reportCard.word}</h1>
                 <div style={{margin:"0 auto", maxWidth:"300px", textAlign:"left"}}>
                     {reasons.map((desc, key)=>{
-                        <div/>
+                        return (
+                            <h3 key={key} style={{ cursor: "pointer" }}
+                                onClick={()=>setReason(key)}
+                            >
+                                {key === reason?
+                                <CheckBox  />
+                                :
+                                <CropSquare  />
+                                }
+                                {" "+desc}
+                            </h3>
+                        )
                     })}
                 </div>
                 <p/>
-                <button>Report</button>
-                <button>Cancel</button>
+                <button onClick={()=>setReport(false)}>Report</button>
+                <button onClick={()=>setReport(false)}>Cancel</button>
                 </div>
             </div>
             :null}
