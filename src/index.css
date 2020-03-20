@@ -5,6 +5,63 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: 'Francois One';
+  background: radial-gradient(circle, rgba(241,241,241,1) 0%, rgba(207,197,197,1) 26%, rgba(228,228,228,1) 50%, rgba(225,229,242,1) 74%, rgba(255,255,255,1) 94%, rgba(232,251,255,1) 100%);
+}
+
+h2{
+  margin: 0
+}
+
+h3{
+  margin: 0
+}
+
+h4{
+  margin: 0
+}
+
+input{
+  width: 90%;
+  padding: 10px;
+  font-size: 25px;
+  margin: 5px
+}
+
+button{
+  border: none;
+  border-radius: 15px;
+  padding: 7px 25px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 25px;
+  box-shadow: 0px 1px 3px 3px rgba(0, 0, 0, 0.1);
+  font-weight: 750;
+  cursor: pointer;
+  margin: 5px;
+  background-color: rgb(103, 97, 202);
+  color: white;
+}
+
+
+label{
+  border-radius: 15px;
+  padding: 0px 10px;
+  text-align: center;
+  background-color: rgb(240, 240, 240);
+  box-shadow: 0px 1px 3px 3px rgba(0, 0, 0, 0.1);
+  font-weight: 750;
+  cursor: pointer;
+  margin-right: 20px
+}
+
+
+button:hover{
+  background-color:rgb(90, 86, 175);
+}
+
+button:focus{
+  outline: 0
 }
 
 code {
