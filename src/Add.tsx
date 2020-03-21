@@ -1,8 +1,12 @@
 import React, { useState } from "react"
 import axios from "axios"
 
+interface Prop{
+  update: any
+}
+
 const arts = ["das", "der", "die"]
-const Add = () =>{
+const Add:React.FC<Prop> = ({ update }) =>{
     const [article, setArticle] = useState("")
     const [word, setWord] = useState("")
     const [name, setName] = useState("")
@@ -66,13 +70,17 @@ const Add = () =>{
                     let today = new Date()
                     let time = today.getMonth() + "/" + today.getDate() + "/" + today.getFullYear()
                     setAdding(true)
-                    axios.post('https://api.motimanager.com',
-                    { name: name, word: word, article: article, time: time})
+                    let newWord = { name: name, word: word, article: article, time: time}
+                    axios.post(
+                      'https://api.motimanager.com/artikle/post',
+                      newWord
+                    )
                     .then(()=>{
                         setWord("")
                         setArticle("")
                         setAdded(true)
                         setAdding(false)
+                        update(newWord)
                     })
                     .catch(()=>{
                         setAdding(false)

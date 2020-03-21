@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Flag, CheckBox, CropSquare } from "@material-ui/icons"
 
 const arts = ["das", "der", "die"]
-const reasons = ["Incorrect article", "None-existent / misspelled word", "Inappropriate word"]
+const reasons = ["Incorrect article", "Non-existent / misspelled word", "Inappropriate / deprecated word"]
 
 interface State {
     quiz: {

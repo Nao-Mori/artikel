@@ -24,8 +24,8 @@ const App:React.FC = () => {
 
 
   useEffect(()=>{
-    axios.get("https://api.motimanager.com/artikle")
-    .then(res => setList(res.data))
+    axios.get("https://api.motimanager.com/artikle/")
+    .then(res => setList(res.data.list))
     .catch(()=> setFail(true))
   },[])
 
@@ -35,6 +35,10 @@ const App:React.FC = () => {
       random = Math.floor(Math.random() * list.length)
     }
     setQuiz(list[random])
+  }
+
+  const update = (newWord: { time: string; name: string; article: string; word: string; }) => {
+    setList([newWord, ...list])
   }
 
   return (
@@ -49,9 +53,9 @@ const App:React.FC = () => {
         <Card quiz={quiz} nextCard={nextCard} />
         <p/>
         <p/>
-        <Add />
+        <Add update={update} />
         <div style={{height:"100px"}} />
-        <div style={{ backgroundColor:"rgb(70,70,70)", color:"white", borderRadius:"20px", maxHeight:"200px", overflow:"auto", padding:"20px" }}>
+        <div style={{ backgroundColor:"rgb(70,70,70)", color:"white", borderRadius:"20px", maxHeight:"400px", overflow:"auto", padding:"20px" }}>
           <h2 style={{ fontWeight:"normal" }}>{list.length} words were added by users!</h2>
           {fail?
             <h3 style={{ margin: 0, padding:"5px", fontWeight: "normal" }}>
@@ -62,7 +66,9 @@ const App:React.FC = () => {
           <ul style={{textAlign:"left", maxWidth:"300px", margin:"0 auto"}}>
           {list.map((card, key)=>{
             return(
-              <li key={key} style={{fontSize:"17px"}}>{card.name} added <strong>{card.article} {card.word}</strong> - {card.time}</li>
+              <li key={key} style={{fontSize:"17px"}}>{card.name} added <strong style={{textDecoration:"underline",fontWeight:"normal"}}>
+                {card.article} {card.word}</strong> - {card.time}
+              </li>
             )
           })}
           </ul>
