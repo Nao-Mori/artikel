@@ -9,9 +9,10 @@ const arts = ["das", "der", "die"]
 const Add:React.FC<Prop> = ({ update }) =>{
     const [article, setArticle] = useState("")
     const [word, setWord] = useState("")
-    const [name, setName] = useState("")
+    const [name, setName] = useState("Anonymous")
     const [added, setAdded] = useState(false)
     const [adding, setAdding] = useState(false)
+    const [error, setError] = useState(false)
 
     return(
         <div 
@@ -46,7 +47,7 @@ const Add:React.FC<Prop> = ({ update }) =>{
               )
           })}
           <input
-            placeholder="Your Word..."
+            placeholder="Word..."
             onChange={event=>{
                 if( event.target.value.length < 15 )setWord(event.target.value)
             }}
@@ -66,21 +67,27 @@ const Add:React.FC<Prop> = ({ update }) =>{
           :
           <button
             onClick={()=>{
+              setError(false)
                 if( name && word.length > 2 && article ){
                     let today = new Date()
-                    let time = today.getMonth() + "/" + today.getDate() + "/" + today.getFullYear()
+                    let time = Number(today.getMonth() + 1 )+ "." + today.getDate() + "." + today.getFullYear()
                     setAdding(true)
-                    let newWord = { name: name, word: word, article: article, time: time}
+                    let edit = word.toLowerCase()
+                    edit = edit.charAt(0).toUpperCase() + edit.slice(1)
+                    let newWord = { name: name, word: edit, article: article, time: time}
                     axios.post(
                       'https://api.motimanager.com/artikle/post',
                       newWord
                     )
-                    .then(()=>{
+                    .then(res=>{
                         setWord("")
                         setArticle("")
-                        setAdded(true)
                         setAdding(false)
-                        update(newWord)
+                        if(res.data) {
+                          setAdded(true)
+                          update(newWord)
+                        }
+                        else setError(true)
                     })
                     .catch(()=>{
                         setAdding(false)
@@ -91,9 +98,12 @@ const Add:React.FC<Prop> = ({ update }) =>{
             ADD
           </button>
         }
-          </div>
-            }
+        {error?
+          <h3 style={{color:"rgb(200,0,0)"}}>The word was already added!</h3>
+        :null}
         </div>
+        }
+      </div>
     )
 }
 

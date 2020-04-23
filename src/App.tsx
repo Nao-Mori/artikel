@@ -14,12 +14,16 @@ const initial = [
   {time: "3/20/2020", name:"Nao", article:"der", word: "Wind"},
   {time: "3/20/2020", name:"Nao", article:"die", word: "Sonne"},
   {time: "3/20/2020", name:"Nao", article:"der", word: "Hand"},
+  {time: "3/20/2020", name:"Nao", article:"das", word: "Bett"},
+  {time: "3/20/2020", name:"Nao", article:"die", word: "Katze"},
 ]
+
+let initialNum:number = Math.floor(Math.random() * initial.length)
 
 
 const App:React.FC = () => {
   const [list, setList] = useState(initial)
-  const [quiz, setQuiz] = useState<Quiz>(initial[0])
+  const [quiz, setQuiz] = useState<Quiz>(initial[initialNum])
   const [fail, setFail] = useState(false)
 
 
@@ -45,7 +49,7 @@ const App:React.FC = () => {
     <div>
       <div style={{backgroundColor:"rgba(255,255,255,0.3)"}}>
         <div style={{maxWidth:"1000px", margin:"0 auto", padding:"15px"}}>
-          <h1 style={{margin:0}}>ARTIKLE</h1>
+          <h1 style={{margin:0}}>ARTIKEL</h1>
           <h3>Globally Shared Flashcards</h3>
         </div>
       </div>

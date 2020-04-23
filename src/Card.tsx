@@ -1,5 +1,6 @@
 import React, { useState } from "react"
-import { Flag, CheckBox, CropSquare } from "@material-ui/icons"
+import { Flag, CheckBox, CropSquare, Book } from "@material-ui/icons"
+import * as emailjs from 'emailjs-com'
 
 const arts = ["das", "der", "die"]
 const reasons = ["Incorrect article", "Non-existent / misspelled word", "Inappropriate / deprecated word"]
@@ -32,6 +33,21 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
         time: "",
     })
     const [answer, setAnswer] = useState("")
+
+    const submit=()=>{
+        let templateParams = {
+            from_name: `Artikle`,
+            to_name: 'Nao',
+            subject: `Word report`,
+            message_html: `${reportCard.article} ${reportCard.word} was reported for ${reasons[reason]}`,
+        }
+        emailjs.send(
+            'gmail',
+            'template_E4vRe8bo',
+            templateParams,
+            'user_DidFMxhza8zx9YgRNBTYS'
+        )
+    }
 
     return(
         <div>
@@ -79,7 +95,17 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             <p/>
             <h4>
                 Added by {quiz.name}
-                <Flag fontSize="large" style={{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
+                <a
+                href = {`https://dictionary.cambridge.org/dictionary/german-english/${quiz.word}`}
+                target = "blank"
+                >
+                    <Book
+                        fontSize = "large"
+                        style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
+                        
+                    />
+                </a>
+                <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
                     setReport(true)
                     setReportCard(quiz)
                 }}/>
@@ -108,7 +134,10 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
                     })}
                 </div>
                 <p/>
-                <button onClick={()=>setReport(false)}>Report</button>
+                <button onClick={()=>{
+                    setReport(false)
+                    submit()
+                }}>Report</button>
                 <button onClick={()=>setReport(false)}>Cancel</button>
                 </div>
             </div>
