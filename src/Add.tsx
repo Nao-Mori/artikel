@@ -1,6 +1,5 @@
 import React, { useState } from "react"
 import axios from "axios"
-import puppeteer from "puppeteer-core"
 
 interface Prop{
   update: any
@@ -14,19 +13,6 @@ const Add:React.FC<Prop> = ({ update }) =>{
     const [added, setAdded] = useState(false)
     const [adding, setAdding] = useState(false)
     const [error, setError] = useState(false)
-
-    const getDefinition = async(wordDE:string) => {
-      const browser = await puppeteer.launch()
-      const page = await browser.newPage()
-      page.goto(`https://dictionary.cambridge.org/dictionary/german-english/${wordDE}`)
-
-      const [el] = await page.$x(`//*[@id="page-content"]/div[2]/div[1]/span/div/div[4]/div/div/div[2]/div[1]/div[3]/span`)
-      const text = await el.getProperty(`txt`)
-      const wordEN = await text.jsonValue()
-      browser.close();
-
-      return wordEN
-    }
 
     return(
         <div 
@@ -92,7 +78,6 @@ const Add:React.FC<Prop> = ({ update }) =>{
                       name: name,
                       word: edit,
                       article: article,
-                      definition: getDefinition(edit),
                       time: time
                     }
                     axios.post(
