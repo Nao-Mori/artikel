@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Flag, CheckBox, CropSquare, Book } from "@material-ui/icons"
 import * as emailjs from 'emailjs-com'
+import axios from "axios"
 
 const arts = ["das", "der", "die"]
 const reasons = ["Incorrect article", "Non-existent / misspelled word", "Inappropriate / deprecated word"]
@@ -26,13 +27,21 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
     const [streak, setStreak] = useState(0)
     const [report, setReport] = useState(false)
     const [reason, setReason] = useState(0)
+    const [answer, setAnswer] = useState("")
     const [reportCard, setReportCard] = useState<Report>({
-        article:"",
+        article: "",
         word: "",
         name: "",
         time: "",
     })
-    const [answer, setAnswer] = useState("")
+    const [detail, setDetail] = useState({})
+
+    const getDetail = () => {
+        axios.post(
+            'https://api.motimanager.com/artikles/definition',
+            { word: quiz.word }
+        ).then(res => console.log(res.data))
+    }
 
     const submit=()=>{
         let templateParams = {
@@ -95,16 +104,12 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             <p/>
             <h4>
                 Added by {quiz.name}
-                <a
-                href = {`https://dictionary.cambridge.org/dictionary/german-english/${quiz.word}`}
-                target = "blank"
-                >
-                    <Book
-                        fontSize = "large"
-                        style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
-                        
-                    />
-                </a>
+                <Book
+                    fontSize = "large"
+                    style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
+                    onClick={()=> getDetail() }
+                    
+                />
                 <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
                     setReport(true)
                     setReportCard(quiz)
@@ -114,12 +119,10 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             <h1>{streak} Streak!</h1>
             {report?
             <div style={{position:"fixed",top:0, left: 0, height: "100vh", width:"100vw",backgroundColor:"rgba(0,0,0,0.5)"}}>
-                
                 <div style={{backgroundColor:"white", marginTop:"25vh", padding:"15px"}}>
-            <h1 style={{margin: 0}}>{reportCard.article} {reportCard.word}</h1>
-                <div style={{margin:"0 auto", maxWidth:"300px", textAlign:"left"}}>
-                    {reasons.map((desc, key)=>{
-                        return (
+                    <h1 style={{margin: 0}}>{reportCard.article} {reportCard.word}</h1>
+                    <div style={{margin:"0 auto", maxWidth:"300px", textAlign:"left"}}>
+                        {reasons.map((desc, key)=>
                             <h3 key={key} style={{ cursor: "pointer" }}
                                 onClick={()=>setReason(key)}
                             >
@@ -130,15 +133,14 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
                                 }
                                 {" "+desc}
                             </h3>
-                        )
-                    })}
-                </div>
-                <p/>
-                <button onClick={()=>{
-                    setReport(false)
-                    submit()
-                }}>Report</button>
-                <button onClick={()=>setReport(false)}>Cancel</button>
+                        )}
+                    </div>
+                    <p/>
+                    <button onClick={()=>{
+                        setReport(false)
+                        submit()
+                    }}>Report</button>
+                    <button onClick={()=>setReport(false)}>Cancel</button>
                 </div>
             </div>
             :null}

@@ -28,7 +28,7 @@ const App:React.FC = () => {
 
 
   useEffect(()=>{
-    axios.get("https://api.motimanager.com/artikle/")
+    axios.get("https://api.motimanager.com/artikles/")
     .then(res => setList(res.data.list))
     .catch(()=> setFail(true))
   },[])

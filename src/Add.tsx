@@ -81,7 +81,7 @@ const Add:React.FC<Prop> = ({ update }) =>{
                       time: time
                     }
                     axios.post(
-                      'https://api.motimanager.com/artikle/post',
+                      'https://api.motimanager.com/artikles/post',
                       newWord
                     )
                     .then(res=>{
