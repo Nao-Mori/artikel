@@ -5,9 +5,7 @@ interface Prop{
   update: any
 }
 
-const arts = ["das", "der", "die"]
 const Add:React.FC<Prop> = ({ update }) =>{
-    const [article, setArticle] = useState("")
     const [word, setWord] = useState("")
     const [name, setName] = useState("Anonymous")
     const [added, setAdded] = useState(false)
@@ -28,24 +26,13 @@ const Add:React.FC<Prop> = ({ update }) =>{
           {added?
           <div>
               <h2>Thank you for sharing!</h2>
+              <h4>The word will be added if it's a valid word.</h4>
               <button onClick={()=>setAdded(false)}>Add more words</button>
               </div>
           :<div>
               <h2>Add New Words!</h2>
+              <h4 style={{ margin: 0 }}>*A singular noun without the article</h4>
           <p/>
-          {arts.map((art, key)=>{
-              return(
-                <button
-                    key={key}
-                    style={art === article?
-                    {backgroundColor: "orange"}
-                    :{}}
-                    onClick={()=>setArticle(art)}
-                >
-                    {art}
-                </button>
-              )
-          })}
           <input
             placeholder="Word..."
             onChange={event=>{
@@ -68,7 +55,7 @@ const Add:React.FC<Prop> = ({ update }) =>{
           <button
             onClick={()=>{
               setError(false)
-                if( name && word.length > 2 && article ){
+                if( name && word.length > 2 ){
                     let today = new Date()
                     let time = Number(today.getMonth() + 1 )+ "." + today.getDate() + "." + today.getFullYear()
                     setAdding(true)
@@ -77,7 +64,6 @@ const Add:React.FC<Prop> = ({ update }) =>{
                     let newWord = {
                       name: name,
                       word: edit,
-                      article: article,
                       time: time
                     }
                     axios.post(
@@ -86,11 +72,9 @@ const Add:React.FC<Prop> = ({ update }) =>{
                     )
                     .then(res=>{
                         setWord("")
-                        setArticle("")
                         setAdding(false)
                         if(res.data) {
                           setAdded(true)
-                          update(newWord)
                         }
                         else setError(true)
                     })

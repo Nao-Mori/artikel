@@ -2,9 +2,18 @@ import React, { useState } from "react"
 import { Flag, CheckBox, CropSquare, Book } from "@material-ui/icons"
 import * as emailjs from 'emailjs-com'
 import axios from "axios"
+import Wrapper from "./FixedWrapper"
 
 const arts = ["das", "der", "die"]
-const reasons = ["Incorrect article", "Non-existent / misspelled word", "Inappropriate / deprecated word"]
+const reasons = ["Inappropriate word",  "Deprecated word"]
+
+const initialDetail = {
+    article: "",
+    word: "",
+    definition: "",
+    textEN: "",
+    textDE: ""
+}
 
 interface State {
     quiz: {
@@ -34,13 +43,23 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
         name: "",
         time: "",
     })
-    const [detail, setDetail] = useState({})
+    const [definition, setDefinition] = useState(false)
+    const [loading, setLoading] = useState(false)
+    const [detail, setDetail] = useState(initialDetail)
 
     const getDetail = () => {
-        axios.post(
-            'https://api.motimanager.com/artikles/definition',
-            { word: quiz.word }
-        ).then(res => console.log(res.data))
+        setDefinition(true)
+        if(detail.word !== quiz.word){
+            setLoading(true)
+            setDetail(initialDetail)
+            axios.post(
+                'https://api.motimanager.com/artikles/definition',
+                { word: quiz.word }
+            ).then(res => {
+                setDetail(res.data)
+                setLoading(false)
+            })
+        }
     }
 
     const submit=()=>{
@@ -107,7 +126,7 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
                 <Book
                     fontSize = "large"
                     style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
-                    onClick={()=> getDetail() }
+                    onClick={getDetail}
                     
                 />
                 <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
@@ -118,31 +137,44 @@ const Card:React.FC<State> = ({quiz, nextCard}) => {
             </div>
             <h1>{streak} Streak!</h1>
             {report?
-            <div style={{position:"fixed",top:0, left: 0, height: "100vh", width:"100vw",backgroundColor:"rgba(0,0,0,0.5)"}}>
-                <div style={{backgroundColor:"white", marginTop:"25vh", padding:"15px"}}>
-                    <h1 style={{margin: 0}}>{reportCard.article} {reportCard.word}</h1>
-                    <div style={{margin:"0 auto", maxWidth:"300px", textAlign:"left"}}>
-                        {reasons.map((desc, key)=>
-                            <h3 key={key} style={{ cursor: "pointer" }}
-                                onClick={()=>setReason(key)}
-                            >
-                                {key === reason?
-                                <CheckBox  />
-                                :
-                                <CropSquare  />
-                                }
-                                {" "+desc}
-                            </h3>
-                        )}
-                    </div>
-                    <p/>
-                    <button onClick={()=>{
-                        setReport(false)
-                        submit()
-                    }}>Report</button>
-                    <button onClick={()=>setReport(false)}>Cancel</button>
-                </div>
-            </div>
+                <Wrapper article={reportCard.article} word={reportCard.word} >
+                        <div style={{margin:"0 auto", maxWidth:"300px", textAlign:"left"}}>
+                            {reasons.map((desc, key)=>
+                                <h3 key={key} style={{ cursor: "pointer" }}
+                                    onClick={()=>setReason(key)}
+                                >
+                                    {key === reason?
+                                    <CheckBox  />
+                                    :
+                                    <CropSquare  />
+                                    }
+                                    {" "+desc}
+                                </h3>
+                            )}
+                        </div>
+                        <p/>
+                        <button onClick={()=>{
+                            setReport(false)
+                            submit()
+                        }}>Report</button>
+                        <button onClick={()=>setReport(false)}>Cancel</button>
+                </Wrapper>
+            :null}
+            {definition?
+                <Wrapper article={detail.article} word={detail.word} >
+                    {!loading?
+                        <div>
+                            <h2>English: {detail.definition}</h2>
+                            <p/>
+                            <h3>Example: {detail.textDE}</h3>
+                            <h3>Translation: {detail.textEN}</h3>
+                            <p/>
+                            <button onClick={()=>setDefinition(false)}>OK</button>
+                        </div>
+                    :
+                        <h2>Searching for the definition...</h2>
+                    }
+                </Wrapper>
             :null}
         </div>
     )
