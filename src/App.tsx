@@ -73,13 +73,13 @@ const App:React.FC = () => {
           ))}
         </div>
       
-      <div style={{textAlign:"center", maxWidth:"800px",margin:"0 auto",  padding:"20px"}}>
+      <div style={{textAlign:"center", margin:"0 auto", padding:"20px 0"}}>
         <Card quiz={quiz} nextCard={nextCard} mode={nav} />
         <p/>
         <p/>
         <Add />
         <div style={{height:"100px"}} />
-        <div style={{ backgroundColor:"rgb(70,70,70)", color:"white", borderRadius:"20px", maxHeight:"400px", overflow:"auto", padding:"20px" }}>
+        <div style={{ backgroundColor:"rgb(70,70,70)", color:"white", borderRadius:"5px", maxHeight:"400px", overflow:"auto", padding:"20px", maxWidth:"800px", margin:"0 auto" }}>
           <h2 style={{ fontWeight:"normal" }}>{list.length} words were added by users!</h2>
           {fail?
             <h3 style={{ margin: 0, padding:"5px", fontWeight: "normal" }}>

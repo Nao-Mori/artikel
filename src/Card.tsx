@@ -62,7 +62,7 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
         backgroundColor: "white",
         boxShadow:"0 0 20px rgba(0,0,0,0.5)",
         padding:"20px",
-        borderRadius:"20px",
+        borderRadius:"15px",
         maxWidth:"500px",
         marginLeft: "auto",
         marginRight: "auto",
@@ -87,7 +87,6 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
                 else arr.unshift(misspell)
             }
             setOption(arr)
-            console.log(arr)
         }
     },[quiz, mode])
 
@@ -166,79 +165,87 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
 
     return(
         <div>
-            <animated.div 
-            style={swap}
-            >
-            {mode === "Article"?
-            <div>
-                <h3 style={{margin:0}}>Choose the Correct Article</h3>
-                <h1><label>{answer?quiz.article:"_____"}</label>{quiz.word}</h1>
-                {arts.map((art, key)=>{
-                    return(
-                    <button
-                        key={key}
+            <div style={{padding: "0 10px"}}>
+                <animated.div 
+                style={swap}
+                >
+                {mode === "Article"?
+                <div>
+                    <h3 style={{margin:0}}>Choose the Correct Article</h3>
+                    <h1><label>{answer?quiz.article:"_____"}</label>{quiz.word}</h1>
+                    {arts.map((art, key)=>{
+                        return(
+                        <button
+                            key={key}
+                            style={
+                            answer === art && answer === quiz.article ?
+                            {backgroundColor:"green"}
+                            :
+                            answer === art?
+                            {backgroundColor:"rgb(200,0,0)"}
+                            :
+                            {}
+                            }
+                            onClick={()=>{
+                            answering(art)
+                            }}
+                        >
+                            {art}
+                        </button>
+                        )
+                    })}
+                </div>
+                : mode === "Spelling" ?
+                <div>
+                    <h3>Choose the word that means...</h3>
+                    <h1 style={{margin: "21px 5px"}}>"{quiz.definition}"</h1>
+                    {option.map((opt, key)=>(
+                        <button key={key} onClick={()=>answering(opt)}
                         style={
-                        answer === art && answer === quiz.article ?
-                        {backgroundColor:"green"}
-                        :
-                        answer === art?
-                        {backgroundColor:"rgb(200,0,0)"}
-                        :
-                        {}
-                        }
-                        onClick={()=>{
-                         answering(art)
-                        }}
-                    >
-                        {art}
-                    </button>
-                    )
-                })}
+                            quiz.word === opt && answer ?
+                            {backgroundColor:"green"}
+                            :
+                            answer === opt ?
+                            {backgroundColor:"rgb(200,0,0)"}
+                            :
+                            {}
+                            }>
+                            {opt}
+                        </button>
+                    ))}
+                </div>
+                :
+                <div>
+                    <h2>Coming Soon!</h2>
+                </div>
+                }
+                <p/>
+                <h4>
+                    <Star fontSize = "large" style = {{ cursor:"pointer", color: "rgb(100,100,100)" }} onClick={()=>{
+                        //"rgb(255, 206, 44)"
+                    }}/>
+                    <Book
+                        fontSize = "large"
+                        style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
+                        onClick={getDetail}
+                        
+                    />
+                    <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
+                        setReport(true)
+                        setReportCard(quiz)
+                    }}/>
+                    Added by {quiz.name}
+                </h4>
+                </animated.div>
             </div>
-            : mode === "Spelling" ?
-            <div>
-                <h3>Choose the word that means...</h3>
-                <h1 style={{margin: "21px 5px"}}>"{quiz.definition}"</h1>
-                {option.map((opt, key)=>(
-                    <button key={key} onClick={()=>answering(opt)}
-                    style={
-                        quiz.word === opt && answer ?
-                        {backgroundColor:"green"}
-                        :
-                        answer === opt ?
-                        {backgroundColor:"rgb(200,0,0)"}
-                        :
-                        {}
-                        }>
-                        {opt}
-                    </button>
-                ))}
-            </div>
-            :
-            <div>
-                <h1>Coming Soon!</h1>
-            </div>
-            }
-            <p/>
-            <h4>
-                <Star fontSize = "large" style = {{ cursor:"pointer", color: "rgb(100,100,100)" }} onClick={()=>{
-                    //"rgb(255, 206, 44)"
-                }}/>
-                <Book
-                    fontSize = "large"
-                    style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
-                    onClick={getDetail}
-                    
-                />
-                <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
-                    setReport(true)
-                    setReportCard(quiz)
-                }}/>
-                Added by {quiz.name}
-            </h4>
-            </animated.div>
-            <h1>{streak} Streak!</h1>
+            <div style={{
+                background:"rgba(255, 255, 255, 0.7)",
+                padding:"10px",
+                margin: "30px auto"
+                }}>
+            <h1 style={{ margin: 0 }}>{streak} Streak!</h1>
             <h2 style={{ margin: 0 }}>High Score : {highScore}</h2>
+            </div>
             <br/>
             {report?
                 <Wrapper article={reportCard.article} word={reportCard.word} >

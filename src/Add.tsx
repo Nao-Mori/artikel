@@ -9,12 +9,13 @@ const Add:React.FC = () =>{
     const [error, setError] = useState(false)
 
     return(
+      <div style={{padding: "0 10px"}}>
         <div 
           style={{
             backgroundColor:"white",
             boxShadow:"0 0 20px rgba(0,0,0,0.5)",
             padding:"20px",
-            borderRadius:"20px",
+            borderRadius:"10px",
             maxWidth:"300px",
             margin: "0 auto",
           }}
@@ -89,7 +90,8 @@ const Add:React.FC = () =>{
         </div>
         }
       </div>
-    )
+    </div>
+  )
 }
 
 export default Add
