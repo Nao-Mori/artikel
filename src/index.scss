@@ -32,7 +32,7 @@ input{
 button{
   border: none;
   border-radius: 15px;
-  padding: 7px 25px;
+  padding: 7px 20px;
   text-align: center;
   text-decoration: none;
   font-size: 25px;
@@ -68,4 +68,35 @@ button:focus{
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.nav {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+  margin: 0 auto;
+  color: white;
+  background-color: rgba(110, 102, 223, 0.658);
+  div {
+    box-sizing: content-box;
+    padding: 10px 5px;
+    font-size: 24px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    color: rgb(224, 224, 224);
+    &:hover{
+      color: rgb(255, 255, 255);
+    }
+    &.active {
+      border-bottom: 7px solid rgb(76, 53, 156);
+      color: white;
+      cursor: default;
+    }
+      
+  }
+}
+
+.c{
+  color: rgb(255, 206, 44)
 }

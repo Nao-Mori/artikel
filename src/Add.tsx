@@ -1,11 +1,7 @@
 import React, { useState } from "react"
 import axios from "axios"
 
-interface Prop{
-  update: any
-}
-
-const Add:React.FC<Prop> = ({ update }) =>{
+const Add:React.FC = () =>{
     const [word, setWord] = useState("")
     const [name, setName] = useState("Anonymous")
     const [added, setAdded] = useState(false)
@@ -20,7 +16,7 @@ const Add:React.FC<Prop> = ({ update }) =>{
             padding:"20px",
             borderRadius:"20px",
             maxWidth:"300px",
-            margin: "0 auto"
+            margin: "0 auto",
           }}
         >
           {added?
