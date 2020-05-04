@@ -3,34 +3,19 @@ import axios from "axios"
 import Add from './Add';
 import Card from "./Card"
 import { animated, useSpring } from "react-spring"
+import { initialList, api } from "./reducer"
+import { FolderOpen } from "@material-ui/icons"
 
-interface Quiz{
-  word: string,
-  name: string,
-  time: string,
-  article: string,
-  definition: string
-}
-
-const initial = [
-  {time: "3/20/2020", name:"Nao", article:"der", word: "Wind", definition: "wind"},
-  {time: "3/20/2020", name:"Nao", article:"die", word: "Sonne", definition: "sun"},
-  {time: "3/20/2020", name:"Nao", article:"die", word: "Hand", definition: "hand"},
-  {time: "3/20/2020", name:"Nao", article:"das", word: "Bett", definition: "bed"},
-  {time: "3/20/2020", name:"Nao", article:"die", word: "Katze", definition: "cat"},
-]
-
-let initialNum:number = Math.floor(Math.random() * initial.length)
-
-const navArray = ["Article", "Spelling", "My Card"]
-
+const modeArray = ["Article", "Definition", "Spelling"]
+const typeArray = ["Noun", "Verb", "All", "Starred"]
 
 const App:React.FC = () => {
-  const [list, setList] = useState(initial)
-  const [quiz, setQuiz] = useState<Quiz>(initial[initialNum])
+  const [list, setList] = useState(initialList)
   const [fail, setFail] = useState(false)
   const [consent, setConsent] = useState(false)
-  const [nav, setNav] = useState<string>(navArray[0])
+  const [mode, setMode] = useState<string>(modeArray[0])
+  const [type, setType] = useState<string>(typeArray[0])
+  const [folder, setFolder] = useState<boolean>(false)
 
   const fade = useSpring({
     opacity: consent? 0 : 1,
@@ -45,36 +30,46 @@ const App:React.FC = () => {
   })
 
   useEffect(()=>{
-    axios.get("https://api.motimanager.com/artikles/")
-    .then(res => setList(res.data.list))
+    axios.get(`${api}`)
+    .then(res => {
+      setList(res.data.list)
+      for( let i = 0; i < res.data.list.length; i ++ ) {
+        if(!res.data.list[i].definition) {
+          console.log(i,res.data.list[i].word)
+        }
+      }
+    })
     .catch(()=> setFail(true))
   },[])
-
-  const nextCard = () =>{
-    let random:number = Math.floor(Math.random() * list.length)
-    while (quiz.article === list[random].article){
-      random = Math.floor(Math.random() * list.length)
-    }
-    setQuiz(list[random])
-  }
 
   return (
     <div>
       <div style={{backgroundColor:"rgba(255,255,255,0.3)"}}>
-        <div style={{maxWidth:"1000px", margin:"0 auto", padding:"15px"}}>
-          <h1 style={{margin:0}}>ARTIKEL</h1>
+        <div style={{maxWidth:"90%", margin:"0 auto", padding:"15px 0"}}>
+          <div style={{ display: "flex", justifyContent: "space-between"}}>
+            <h1 style={{margin:0}}>ARTIKEL</h1> 
+            <button
+             style={{ display: "flex", fontSize:"15px"}}
+             onClick={()=>setFolder(true)}
+            >
+              <FolderOpen />
+              <h3 style={{paddingTop:"3px", paddingLeft:"3px"}}>
+                {type}
+              </h3>
+            </button>
+          </div>
           <h4>Globally Shared Flashcards to Learn German</h4>
         </div>
         </div>
         <div className="nav" >
-          {navArray.map((category, key)=>(
-            <div className={category === nav? "active": ""} key={key}
-            onClick={()=>setNav(category)}>{category}</div>
+          {modeArray.map((category, key)=>(
+            <div className={category === mode? "active": ""} key={key}
+            onClick={()=>setMode(category)}>{category}</div>
           ))}
         </div>
       
       <div style={{textAlign:"center", margin:"0 auto", padding:"20px 0"}}>
-        <Card quiz={quiz} nextCard={nextCard} mode={nav} />
+        <Card list={list} mode={mode} type={type} />
         <p/>
         <p/>
         <Add />
@@ -98,6 +93,28 @@ const App:React.FC = () => {
           </ul>
         </div>
       </div>
+      {folder?
+      <div style={{ position:"fixed", width:"100vw", height: "100vh", top: 0, left: 0, backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div style={{ width:"100%", background: "white", marginTop: "25vh", textAlign: "center", padding:"10px" }}>
+        <h1 style={{margin: "5px"}}>Choose a folder!</h1>
+        <h4>*The change will be made from the next card.</h4>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", margin: "10px 0" }}>
+          {typeArray.map((ty, key)=>(
+            <button key={key}
+            style={{ fontSize: "15px", display: "flex" }}
+            onClick={()=> {
+              setType(ty)
+              setFolder(false)
+            }}>
+              <FolderOpen />
+              <h3 style={{ paddingLeft: "3px", paddingTop: "3px" }}>{ty}</h3>
+            </button>
+          ))}
+          </div>
+          <button className="red" onClick={()=>setFolder(false)}>Cancel</button>
+        </div>
+      </div>
+      :null}
       <animated.div style={fade}>
           <h3>This website uses cookies to save your high score and your custom cards!</h3>
           <button style={{ fontSize: "15px" }} onClick={()=>setConsent(true)}>Alright!</button>

@@ -5,6 +5,7 @@ import axios from "axios"
 import Wrapper from "./FixedWrapper"
 import { animated, useSpring } from "react-spring"
 import ReactLoading from 'react-loading';
+import { initialList, api } from "./reducer"
 
 const arts = ["das", "der", "die"]
 const reasons = ["Inappropriate word",  "Deprecated word"]
@@ -17,41 +18,59 @@ const initialDetail = {
     textDE: ""
 }
 
+const initialReport = {
+    article: "",
+    word: "",
+    name: "",
+    time: "",
+    definition: "",
+    type: ""
+}
+
 interface State {
-    quiz: {
+    list: {
         article: string,
         word: string,
         name: string,
         time: string,
         definition: string,
-    },
-    nextCard:()=> void,
+        type: string
+
+    }[],
+    type: string,
     mode: string
 }
 
-interface Report {
+interface Quiz {
     article: string,
     word: string,
     name: string,
     time: string,
-    definition: string
+    definition: string,
+    type : string | undefined
 }
 
-const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
+let initialNum = Math.floor(Math.random() * 5)
+
+const Card:React.FC<State> = ({ list, mode, type }) => {
+    const [quiz, setQuiz] = useState<Quiz>(initialList[initialNum])
+
     const [streak, setStreak] = useState(0)
     const [report, setReport] = useState(false)
     const [reason, setReason] = useState(0)
     const [answer, setAnswer] = useState("")
     const [highScore, setHighScore] = useState<number | null>(null)
-    const [reportCard, setReportCard] = useState<Report>({
-        article: "",
-        word: "",
-        name: "",
-        time: "",
-        definition: "",
-    })
+    const [reportCard, setReportCard] = useState<Quiz>(initialReport)
+
+    const [myCards, setMyCards] = useState<Quiz[]>([])
+    const [starred, setStarred] = useState<boolean>(false)
+
     const [option, setOption] = useState<string[]>([])
+
+    const [error, setError] = useState<boolean>(false)
+
     const [definition, setDefinition] = useState(false)
+
     const [loading, setLoading] = useState(false)
     const [detail, setDetail] = useState(initialDetail)
     const [swapping, setSwapping] = useState(false)
@@ -68,12 +87,10 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
         marginRight: "auto",
     })
 
-    
-
     useEffect(()=>{
+        let or = quiz.word
+        let arr:string[] = [or]
         if(mode === "Spelling") {
-            let or = quiz.word
-            let arr:string[] = [or]
             for(let i = 1; i < or.length - 1; i ++) {
                 if(i === 5) break;
                 let misspell = ""
@@ -87,25 +104,88 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
                 else arr.unshift(misspell)
             }
             setOption(arr)
+        } else if (mode === "Definition") {
+            arr = [or, or, or]
+
+            while ( arr.length !== new Set(arr).size ) {
+                arr = [or]
+                for( let i = 0; i < 3; i ++ ) {
+                    let ranNum = Math.floor(Math.random() * 2)
+                    let ranNum2 = Math.floor(Math.random() * list.length)
+                    if(ranNum) arr.push(list[ranNum2].word)
+                    else arr.push(list[ranNum2].word)
+                }
+            }
+            setOption(arr)
+
         }
     },[quiz, mode])
 
-    useEffect(()=>{
+    const takeCookies = () =>{
+        let value = document.cookie;
+        let parts:string[] = value.split(/;|=/);
+        let final = { highScore: 0, myCards: [] }
+        console.log(parts)
+        if(parts.length === 4) {
+            if(parts[0] === "Score" ) {
+                final.highScore = Number(parts[1])
+                final.myCards = JSON.parse(parts[3])
+            } else {
+                final.highScore = Number(parts[3])
+                final.myCards = JSON.parse(parts[1])
+            }
+        }
+        return final
+    }
+
+    useEffect(()=> {
         if(highScore !== null) {
             if(highScore < streak) {
                 setHighScore(streak)
                 document.cookie = `Score=${streak}; expires=Thu, 31 Dec ${new Date().getFullYear() + 1} 00:00:00 UTC; path=/;`
             }
-        } else if(document.cookie) {
-            let value = document.cookie;
-            let parts:string[] = value.split("; Score=");
-            let numStr = parts[0].split("=")
-            setHighScore(Number(numStr[1]))
+        } else if (document.cookie) {
+            let cookie = takeCookies()
+            setHighScore(cookie.highScore)
+            setMyCards(cookie.myCards)
+            console.log(cookie.myCards)
         } else {
             setHighScore(0)
             document.cookie = `Score=0; expires=Thu, 31 Dec ${new Date().getFullYear() + 1} 00:00:00 UTC; path=/;`
+            let array:string[] = []
+            document.cookie = `MyCards=${JSON.stringify(array)}; expires=Thu, 31 Dec ${new Date().getFullYear() + 1} 00:00:00 UTC; path=/;`
         }
     },[streak])
+
+    const nextCard = () => {
+        setStarred(false)
+        let typeStr = type? type.toLowerCase() : "noun"
+        if( typeStr === "starred" ) {
+            setStarred(true)
+            if(myCards.length === 1){
+                setQuiz(myCards[0])
+            } else if (myCards.length > 1){
+                let tempList = myCards.filter(item => item.word !== quiz.word)
+                let random:number = Math.floor(Math.random() * tempList.length)
+                setQuiz(tempList[random])
+            } else {
+                setError(true)
+            }
+        } else {
+            let temp = list.filter(item => item.word !== quiz.word)
+            let tempList = typeStr !== "all" ? temp.filter(item => item.type === typeStr) : temp
+            let random:number = Math.floor(Math.random() * tempList.length)
+            if( type !== "starred" ) {
+                for (let i = 0; i < myCards.length; i ++) {
+                    if(myCards[i].word === tempList[random].word) {
+                        setStarred(true)
+                        break;
+                    }
+                }
+            } 
+            setQuiz(tempList[random])
+        }
+    }
 
     const getDetail = () => {
         setDefinition(true)
@@ -114,7 +194,7 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
             setDetail(initialDetail)
             axios.defaults.timeout = 10000;
             axios.post(
-                'https://api.motimanager.com/artikles/definition',
+                `${api}definition`,
                 { word: quiz.word }
             ).then(res => {
                 setDetail(res.data)
@@ -147,6 +227,10 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
         )
     }
 
+    useEffect(()=> {
+        document.cookie = `MyCards=${JSON.stringify(myCards)}; expires=Thu, 31 Dec ${new Date().getFullYear() + 1} 00:00:00 UTC; path=/;`
+    },[myCards])
+
     const answering = (an:string) => {
         if(!answer) {
             setAnswer(an)
@@ -169,73 +253,96 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
                 <animated.div 
                 style={swap}
                 >
-                {mode === "Article"?
-                <div>
-                    <h3 style={{margin:0}}>Choose the Correct Article</h3>
-                    <h1><label>{answer?quiz.article:"_____"}</label>{quiz.word}</h1>
-                    {arts.map((art, key)=>{
-                        return(
-                        <button
-                            key={key}
-                            style={
-                            answer === art && answer === quiz.article ?
-                            {backgroundColor:"green"}
+                {error?
+                    <div>
+                        <h3>Looks like there's no word in this folder!
+                            <br/>
+                        Please select another folder and refresh.</h3>
+                        <button onClick={()=>{
+                            setError(false)
+                            nextCard()
+                        }}>Refresh</button>
+                    </div>
+                    :<div>
+                        {mode === "Article"?
+                        <div>
+                            {quiz.article ?
+                            <div>
+                            <h3 style={{margin:0}}>Choose the Correct Article</h3>
+                            <h1><label>{answer?quiz.article:"_____"}</label>{quiz.word}</h1>
+                            {arts.map((art, key)=>{
+                                return(
+                                <button
+                                    key={key}
+                                    style={
+                                    answer === art && answer === quiz.article ?
+                                    {backgroundColor:"green"}
+                                    :
+                                    answer === art?
+                                    {backgroundColor:"rgb(200,0,0)"}
+                                    :
+                                    {}
+                                    }
+                                    onClick={()=>{
+                                    answering(art)
+                                    }}
+                                >
+                                    {art}
+                                </button>
+                                )
+                            })}
+                            </div>
                             :
-                            answer === art?
-                            {backgroundColor:"rgb(200,0,0)"}
-                            :
-                            {}
+                            <div>
+                                <h2>The next word is not a noun!<br/>Please play either "Definition" or "Spelling" mode.</h2>
+                            </div>
                             }
+                        </div>
+                        :
+                        <div>
+                            <h3>Choose the word that means...</h3>
+                            <h1 style={{margin: "21px 5px"}}>"{quiz.definition}"</h1>
+                            {option.map((opt, key)=>(
+                                <button key={key} onClick={()=>answering(opt)}
+                                style={
+                                    quiz.word === opt && answer ?
+                                    {backgroundColor:"green"}
+                                    :
+                                    answer === opt ?
+                                    {backgroundColor:"rgb(200,0,0)"}
+                                    :
+                                    {}
+                                    }>
+                                    {opt}
+                                </button>
+                            ))}
+                        </div>
+                        }
+                        <p/>
+                        <h4>
+                            <Star fontSize = "large" style = {{ cursor:"pointer", color: starred? "rgb(255, 206, 44)" : "rgb(100,100,100)" }}
                             onClick={()=>{
-                            answering(art)
-                            }}
-                        >
-                            {art}
-                        </button>
-                        )
-                    })}
-                </div>
-                : mode === "Spelling" ?
-                <div>
-                    <h3>Choose the word that means...</h3>
-                    <h1 style={{margin: "21px 5px"}}>"{quiz.definition}"</h1>
-                    {option.map((opt, key)=>(
-                        <button key={key} onClick={()=>answering(opt)}
-                        style={
-                            quiz.word === opt && answer ?
-                            {backgroundColor:"green"}
-                            :
-                            answer === opt ?
-                            {backgroundColor:"rgb(200,0,0)"}
-                            :
-                            {}
-                            }>
-                            {opt}
-                        </button>
-                    ))}
-                </div>
-                :
-                <div>
-                    <h2>Coming Soon!</h2>
-                </div>
-                }
-                <p/>
-                <h4>
-                    <Star fontSize = "large" style = {{ cursor:"pointer", color: "rgb(100,100,100)" }} onClick={()=>{
-                        //"rgb(255, 206, 44)"
-                    }}/>
-                    <Book
-                        fontSize = "large"
-                        style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
-                        onClick={getDetail}
-                        
-                    />
-                    <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
-                        setReport(true)
-                        setReportCard(quiz)
-                    }}/>
-                    Added by {quiz.name}
-                </h4>
+                                setStarred(!starred)
+                                if(!starred) {
+                                    console.log(myCards)
+                                    setMyCards([...myCards, quiz])
+                                } else {
+                                    setMyCards(myCards.filter(item => item.word !== quiz.word));
+                                }
+                            }}/>
+                            <Book
+                                fontSize = "large"
+                                style = {{cursor:"pointer",color:"rgb(140,40,40)"}}
+                                onClick={getDetail}
+                                
+                            />
+                            <Flag fontSize = "large" style = {{cursor:"pointer",color:"rgb(200,0,0)"}} onClick={()=>{
+                                setReport(true)
+                                setReportCard(quiz)
+                            }}/>
+                            Added by {quiz.name}
+                        </h4>
+                    </div>}
                 </animated.div>
             </div>
             <div style={{
@@ -284,9 +391,11 @@ const Card:React.FC<State> = ({quiz, nextCard, mode}) => {
                             <button onClick={()=>setDefinition(false)}>OK</button>
                         </div>
                     :
-                        <div style={{maxWidth:"170px", margin:"0 auto", height:"160px"}}>
+                        <div style={{maxWidth:"250px", margin:"0 auto", height:"180px"}}>
                             <h4>Opening a dictionary...</h4>
-                            <ReactLoading type={"bars"} color={"rgb(103, 97, 202)"} width={"160px"} />
+                            <div style={{maxWidth:"150px", margin:"0 auto" }}>
+                                <ReactLoading type={"bars"} color={"rgb(103, 97, 202)"} width={"160px"} />
+                            </div>
                         </div>
                     }
                 </Wrapper>

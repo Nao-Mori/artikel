@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import axios from "axios"
+import { api } from "./reducer"
 
 const Add:React.FC = () =>{
     const [word, setWord] = useState("")
@@ -28,7 +29,7 @@ const Add:React.FC = () =>{
               </div>
           :<div>
               <h2>Add New Words!</h2>
-              <h4 style={{ margin: 0 }}>*A singular noun without the article</h4>
+              <h4 style={{ margin: 0 }}>*Without the article</h4>
           <p/>
           <input
             placeholder="Word..."
@@ -64,7 +65,7 @@ const Add:React.FC = () =>{
                       time: time
                     }
                     axios.post(
-                      'https://api.motimanager.com/artikles/post',
+                      `${api}post`,
                       newWord
                     )
                     .then(res=>{

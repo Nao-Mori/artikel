@@ -29,7 +29,7 @@ input{
   font-weight: 800;
 }
 
-button{
+button {
   border: none;
   border-radius: 15px;
   padding: 7px 20px;
@@ -42,6 +42,19 @@ button{
   margin: 5px;
   background-color: rgb(103, 97, 202);
   color: white;
+  &:hover{
+    background-color:rgb(90, 86, 175);
+  }
+  &:focus{
+    outline: 0
+  }
+  &.red {
+    font-size: 22px;
+    background-color: rgb(202, 97, 114);
+    &:hover{
+      background-color:rgb(175, 86, 93);
+    }
+  }
 }
 
 
@@ -54,15 +67,6 @@ label{
   font-weight: 750;
   cursor: pointer;
   margin-right: 20px
-}
-
-
-button:hover{
-  background-color:rgb(90, 86, 175);
-}
-
-button:focus{
-  outline: 0
 }
 
 code {
