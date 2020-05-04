@@ -294,7 +294,7 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                             </div>
                             :
                             <div>
-                                <h2>The next word is not a noun!<br/>Please play either "Definition" or "Spelling" mode.</h2>
+                                <h2>The next word is not a noun! Please play either "Definition" or "Spelling" mode.</h2>
                             </div>
                             }
                         </div>

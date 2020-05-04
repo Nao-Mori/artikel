@@ -95,7 +95,7 @@ const App:React.FC = () => {
       </div>
       {folder?
       <div style={{ position:"fixed", width:"100vw", height: "100vh", top: 0, left: 0, backgroundColor: "rgba(0,0,0,0.5)" }}>
-        <div style={{ width:"100%", background: "white", marginTop: "25vh", textAlign: "center", padding:"10px" }}>
+        <div style={{ width:"100%", background: "white", marginTop: "25vh", textAlign: "center", padding:"10px 0" }}>
         <h1 style={{margin: "5px"}}>Choose a folder!</h1>
         <h4>*The change will be made from the next card.</h4>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", margin: "10px 0" }}>
