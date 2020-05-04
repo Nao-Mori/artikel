@@ -106,18 +106,19 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
             setOption(arr)
         } else if (mode === "Definition") {
             arr = [or, or, or]
-
+            let tempList = []
+            if (quiz.type !== "verb" && quiz.type !== "noun") tempList = list
+            else tempList = list.filter(item => ( item.type === quiz.type || (!item.type && quiz.type === "noun") ))
             while ( arr.length !== new Set(arr).size ) {
                 arr = [or]
                 for( let i = 0; i < 3; i ++ ) {
                     let ranNum = Math.floor(Math.random() * 2)
-                    let ranNum2 = Math.floor(Math.random() * list.length)
-                    if(ranNum) arr.push(list[ranNum2].word)
-                    else arr.push(list[ranNum2].word)
+                    let ranNum2 = Math.floor(Math.random() * tempList.length)
+                    if(ranNum) arr.push(tempList[ranNum2].word)
+                    else arr.push(tempList[ranNum2].word)
                 }
             }
             setOption(arr)
-
         }
     },[quiz, mode])
 
@@ -173,7 +174,7 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
             }
         } else {
             let temp = list.filter(item => item.word !== quiz.word)
-            let tempList = typeStr !== "all" ? temp.filter(item => item.type === typeStr) : temp
+            let tempList = typeStr !== "all" ? temp.filter(item => (item.type === typeStr || (!item.type && typeStr === "noun"))) : temp
             let random:number = Math.floor(Math.random() * tempList.length)
             if( type !== "starred" ) {
                 for (let i = 0; i < myCards.length; i ++) {
@@ -302,20 +303,24 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                         <div>
                             <h3>Choose the word that means...</h3>
                             <h1 style={{margin: "21px 5px"}}>"{quiz.definition}"</h1>
-                            {option.map((opt, key)=>(
+                            {option.map((opt, key)=>{
+                                let print = opt
+                                if(quiz.type && quiz.type !== "noun") {
+                                    let noFirstLetter = opt.substring(1)
+                                    let firstLetter = opt.substring(0,1)
+                                    print = firstLetter.toLowerCase() + noFirstLetter
+                                }
+                                return (
                                 <button key={key} onClick={()=>answering(opt)}
                                 style={
-                                    quiz.word === opt && answer ?
-                                    {backgroundColor:"green"}
-                                    :
-                                    answer === opt ?
-                                    {backgroundColor:"rgb(200,0,0)"}
-                                    :
-                                    {}
+                                    quiz.word === opt && answer ? {backgroundColor:"green"}
+                                    : answer === opt ? {backgroundColor:"rgb(200,0,0)"}
+                                    : {}
                                     }>
-                                    {opt}
+                                    {print}
                                 </button>
-                            ))}
+                                )
+                            })}
                         </div>
                         }
                         <p/>
