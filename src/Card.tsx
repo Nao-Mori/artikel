@@ -10,6 +10,8 @@ import { initialList, api } from "./reducer"
 const arts = ["das", "der", "die"]
 const reasons = ["Inappropriate word",  "Deprecated word"]
 
+var used:string[] = []
+
 const initialDetail = {
     article: "",
     word: "",
@@ -115,7 +117,7 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                     let ranNum = Math.floor(Math.random() * 2)
                     let ranNum2 = Math.floor(Math.random() * tempList.length)
                     if(ranNum) arr.push(tempList[ranNum2].word)
-                    else arr.push(tempList[ranNum2].word)
+                    else arr.unshift(tempList[ranNum2].word)
                 }
             }
             setOption(arr)
@@ -126,7 +128,6 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
         let value = document.cookie;
         let parts:string[] = value.split(/;|=/);
         let final = { highScore: 0, myCards: [] }
-        console.log(parts)
         if(parts.length === 4) {
             if(parts[0] === "Score" ) {
                 final.highScore = Number(parts[1])
@@ -149,7 +150,6 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
             let cookie = takeCookies()
             setHighScore(cookie.highScore)
             setMyCards(cookie.myCards)
-            console.log(cookie.myCards)
         } else {
             setHighScore(0)
             document.cookie = `Score=0; expires=Thu, 31 Dec ${new Date().getFullYear() + 1} 00:00:00 UTC; path=/;`
@@ -158,7 +158,27 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
         }
     },[streak])
 
-    const nextCard = () => {
+    const filterList = () => {
+        let typeStr = type? type.toLowerCase() : "noun"
+        let filteredList = list.filter(item => {
+            let result = true
+            let tempType = !item.type ? "noun" : item.type
+            if(item.word === quiz.word) result = false
+            else if(tempType !== typeStr && typeStr !== "all" ) result = false
+            else {
+                for(let i = 0; i < used.length; i ++) {
+                    if(used[i] === item.word) {
+                        result = false
+                        break
+                    }
+                }
+            }
+            return result
+        })
+        return filteredList
+    }
+
+    const nextCard = (correct:boolean) => {
         setStarred(false)
         let typeStr = type? type.toLowerCase() : "noun"
         if( typeStr === "starred" ) {
@@ -173,8 +193,11 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                 setError(true)
             }
         } else {
-            let temp = list.filter(item => item.word !== quiz.word)
-            let tempList = typeStr !== "all" ? temp.filter(item => (item.type === typeStr || (!item.type && typeStr === "noun"))) : temp
+            let tempList = filterList()
+            if(tempList.length === 0) {
+                used = []
+                tempList = filterList()
+            } else if (correct) used.push(quiz.word)
             let random:number = Math.floor(Math.random() * tempList.length)
             if( type !== "starred" ) {
                 for (let i = 0; i < myCards.length; i ++) {
@@ -235,13 +258,14 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
     const answering = (an:string) => {
         if(!answer) {
             setAnswer(an)
-            if(an === quiz.article || an === quiz.word) setStreak(streak + 1)
+            let correct = an === quiz.article || an === quiz.word
+            if(correct) setStreak(streak + 1)
             else setStreak(0)
             setTimeout(()=> {
                 setSwapping(true)
                 setTimeout(()=>{
                     setSwapping(false)
-                    nextCard()
+                    nextCard(correct)
                     setAnswer("")
                 },300)
             }, 1000)
@@ -261,7 +285,7 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                         Please select another folder and refresh.</h3>
                         <button onClick={()=>{
                             setError(false)
-                            nextCard()
+                            nextCard(false)
                         }}>Refresh</button>
                     </div>
                     :<div>
@@ -329,7 +353,6 @@ const Card:React.FC<State> = ({ list, mode, type }) => {
                             onClick={()=>{
                                 setStarred(!starred)
                                 if(!starred) {
-                                    console.log(myCards)
                                     setMyCards([...myCards, quiz])
                                 } else {
                                     setMyCards(myCards.filter(item => item.word !== quiz.word));
