@@ -67,6 +67,12 @@ const App:React.FC = () => {
             onClick={()=>setMode(category)}>{category}</div>
           ))}
         </div>
+
+        {fail?
+            <h3 style={{ margin: 0, padding:"5px", fontWeight: "normal" }}>
+              *Server didn't respond, you don't have access to all the words.
+            </h3>
+          :null}
       
       <div style={{textAlign:"center", margin:"0 auto", padding:"20px 0"}}>
         <Card list={list} mode={mode} type={type} />
@@ -74,13 +80,9 @@ const App:React.FC = () => {
         <p/>
         <Add />
         <div style={{height:"100px"}} />
+        {list.length > 8 ?
         <div style={{ backgroundColor:"rgb(70,70,70)", color:"white", borderRadius:"5px", maxHeight:"400px", overflow:"auto", padding:"20px", maxWidth:"800px", margin:"0 auto" }}>
           <h2 style={{ fontWeight:"normal" }}>{list.length} words were added by users!</h2>
-          {fail?
-            <h3 style={{ margin: 0, padding:"5px", fontWeight: "normal" }}>
-              *Server didn't respond, you don't have access to all the words.
-            </h3>
-          :null}
           <p/>
           <ul style={{textAlign:"left", maxWidth:"300px", margin:"0 auto"}}>
           {list.map((card, key)=>{
@@ -92,6 +94,7 @@ const App:React.FC = () => {
           })}
           </ul>
         </div>
+        :null}
       </div>
       {folder?
       <div style={{ position:"fixed", width:"100vw", height: "100vh", top: 0, left: 0, backgroundColor: "rgba(0,0,0,0.5)" }}>

@@ -34,7 +34,7 @@ const Add:React.FC = () =>{
           <input
             placeholder="Word..."
             onChange={event=>{
-                if( event.target.value.length < 15 )setWord(event.target.value)
+              setWord(event.target.value)
             }}
              value={word}
           />
@@ -42,7 +42,7 @@ const Add:React.FC = () =>{
           <input
             placeholder="Your Name..."
             onChange={event=>{
-                if( event.target.value.length < 15 )setName(event.target.value)
+              setName(event.target.value)
             }}
              value={name}
           />
